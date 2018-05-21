@@ -1,0 +1,38 @@
+{
+  "name": "cano-koa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "koa",
+    "cano",
+    "cano-koa",
+    "framework"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha -w -R spec ./test/*.js"
+  },
+  "bugs": {
+    "url": "https://github.com/cano-koa/cano-koa/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cano-koa/cano-koa.git"
+  },
+  "author": "Ernesto Rojas <ernesto20145@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "koa": "^2.5.1",
+    "lodash": "^4.17.10",
+    "require-all": "^2.2.0"
+  },
+  "devDependencies": {
+    "cano-cube": "git+https://github.com/cano-koa/cano-cube.git",
+    "mocha": "^5.2.0"
+  },
+  "homepage": "https://github.com/cano-koa/cano-koa"
+}
