@@ -26,8 +26,8 @@ module.exports = class Core extends Koa {
       global.cano = self;
       initCubesLifeCycle(cubes)
       .then(() => {
-        const port = self.app.config.web.port;
-        self.log('Ready for listen events on port', port, ' :)');
+        const { port } = self.app.config.web;
+        self.log.info('Ready for listen events on port', port, ' :)');
         resolve(self.listen(port));
       }).catch(reject);
     });
@@ -117,5 +117,10 @@ const configDafault = {
     port: process.env.PORT || 20145,
     env: process.env.NODE_ENV || 'development',
   },
-  log: console.log,
+  log: {
+    debug: console.log,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+  },
 };
