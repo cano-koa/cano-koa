@@ -10,29 +10,29 @@ module.exports = class Core extends Koa {
   constructor(path) {
     super();
     this.app = _.assign({}, buildPaths(path));
-    this.app.config = buildConfig(this.app.paths.config);
+    this.app.config = buildConfig(this.app.paths.config)
     this.log = this.app.config.log;
   }
   /**
    * @method up
    * @description This method allows the koa server to get up after the cubes load correctly.
    * @returns {Promise} This promise when resolved will return the server object.
-   * @author Ernesto Rojas <ernesto20145@gmail.com>
+   * @author Ernesto Rojas <ernesto20145@gmail.com> Antonio Mejias <antoniomejiasv94@gmail.com>
    */
   up() {
+    loadMiddlewares();
     const cubes = instantCubes(this, this.app.config.cubes);
-    const self = this;
     return new Promise((resolve, reject) => {
-      global.cano = self;
+      global.cano = this;
       initCubesLifeCycle(cubes)
       .then(() => {
-        const { port } = self.app.config.web;
-        self.log.info('Ready for listen events on port', port, ' :)');
-        resolve(self.listen(port));
+        const { port } = this.app.config.web;
+        this.log.info('Ready for listen events on port', port, ' :)');
+        resolve(this.listen(port));
       }).catch(reject);
     });
   }
-  
+
 }
 
 /**
@@ -57,10 +57,32 @@ function buildPaths(root) {
  * @param {string} String with the path to the configuration files.
  * @description This method allows configuration files to be required in the same object.
  * @returns {object} Object with the required configuration files.
- * @author Ernesto Rojas <ernesto20145@gmail.com>
+ * @author Ernesto Rojas <ernesto20145@gmail.com> Antonio Mejias <antoniomejiasv94@gmail.com>
  */
 function buildConfig(path) {
-  return _.merge({}, configDafault, require('require-all')(path));
+  const object = _.merge({}, configDafault, require('require-all')(path));
+  const config = {};
+  _.forEach(object, (value, key) => {
+      Object.defineProperty(config, key, {
+          value,
+          writable: false,
+          enumerable: true,
+
+      })
+  })
+  return config;
+}
+/**
+ * @method loadMiddlewares
+ * @param {object} Object cano.
+ * @description This method set the koa middleware into the cano app core.
+ * @author Antonio Mejias <antoniomejiasv94@gmail.com>
+ */
+function loadMiddlewares(cano) {
+  const { middlewares } = cano.app.config;
+  if (middlewares && Array.isArray(middlewares) && middlewares.length === 0) {
+     _.forEach(middlewares, middleware => cano.use(middleware))
+  }
 }
 
 /**
