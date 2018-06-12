@@ -20,8 +20,8 @@ module.exports = class Core extends Koa {
    * @author Ernesto Rojas <ernesto20145@gmail.com> Antonio Mejias <antoniomejiasv94@gmail.com>
    */
     up() {
-        loadMiddlewares(this);
         listenForShutdownEvents();
+        loadMiddlewares(this);
         const cubes = instantCubes(this, this.app.config.cubes);
         return new Promise((resolve, reject) => {
             global.cano = this;
@@ -79,7 +79,7 @@ function buildConfig(path) {
  */
 function loadMiddlewares(cano) {
     const {middlewares} = cano.app.config;
-    if (middlewares && Array.isArray(middlewares) && middlewares.length === 0) {
+    if (middlewares && Array.isArray(middlewares) && middlewares.length > 0) {
         _.forEach(middlewares, middleware => cano.use(middleware))
     }
 }
@@ -144,7 +144,7 @@ function promisifyCubeLifeCycle(cube) {
     })
 }
 
-const BASIC_SIGNALS = ['SIGNT', 'SIGTERM', 'SIGQUIT'];
+const BASIC_SIGNALS = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
 
 // Object with configuration default.
 const configDafault = {
