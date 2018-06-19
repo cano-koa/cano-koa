@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "cano-cube": "git+https://github.com/cano-koa/cano-cube.git",
+    "koa-logger": "^3.2.0",
     "mocha": "^5.2.0"
   },
   "homepage": "https://github.com/cano-koa/cano-koa"
