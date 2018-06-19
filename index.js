@@ -3,36 +3,35 @@ const _ = require('lodash');
 let path = require('path');
 
 module.exports = class Core extends Koa {
-    /**
-   * @constructs
-   * @author Ernesto Rojas <ernesto20145@gmail.com>
-   */
-    constructor(path) {
-        super();
-        this.app = _.assign({}, buildPaths(path));
-        this.app.config = buildConfig(this.app.paths.config)
-        this.log = this.app.config.log;
-    }
-    /**
-   * @method up
-   * @description This method allows the koa server to get up after the cubes load correctly.
-   * @returns {Promise} This promise when resolved will return the server object.
-   * @author Ernesto Rojas <ernesto20145@gmail.com> Antonio Mejias <antoniomejiasv94@gmail.com>
-   */
-    up() {
-        listenForShutdownEvents();
-        loadMiddlewares(this);
-        const cubes = instantCubes(this, this.app.config.cubes);
-        return new Promise((resolve, reject) => {
-            global.cano = this;
-            initCubesLifeCycle(cubes).then(() => {
-                const {port} = this.app.config.web;
-                this.log.info('Ready for listen events on port', port, ' :)');
-                resolve(this.listen(port));
-            }).catch(reject);
-        });
-    }
-
+  /**
+ * @constructs
+ * @author Ernesto Rojas <ernesto20145@gmail.com>
+ */
+  constructor(path) {
+    super();
+    this.app = _.assign({}, buildPaths(path));
+    this.app.config = buildConfig(this.app.paths.config)
+    this.log = this.app.config.log;
+  }
+  /**
+ * @method up
+ * @description This method allows the koa server to get up after the cubes load correctly.
+ * @returns {Promise} This promise when resolved will return the server object.
+ * @author Ernesto Rojas <ernesto20145@gmail.com> Antonio Mejias <antoniomejiasv94@gmail.com>
+ */
+  up() {
+    return new Promise((resolve, reject) => {
+      listenForShutdownEvents();
+      const cubes = instantCubes(this, this.app.config.cubes);
+      global.cano = this;
+      loadMiddlewares(this);
+      initCubesLifeCycle(cubes).then(() => {
+        const {port} = this.app.config.web;
+        this.log.info('Ready for listen events on port', port, ' :)');
+        resolve(this.listen(port));
+      }).catch(reject);
+    });
+  }
 }
 
 /**
@@ -43,13 +42,13 @@ module.exports = class Core extends Koa {
  * @author Ernesto Rojas <ernesto20145@gmail.com>
  */
 function buildPaths(root) {
-    return {
-        paths: {
-            config: path.join(root, '/config'),
-            api: path.join(root, '/api'),
-            root
-        }
+  return {
+    paths: {
+      config: path.join(root, '/config'),
+      api: path.join(root, '/api'),
+      root,
     }
+  }
 }
 
 /**
@@ -60,16 +59,16 @@ function buildPaths(root) {
  * @author Ernesto Rojas <ernesto20145@gmail.com> Antonio Mejias <antoniomejiasv94@gmail.com>
  */
 function buildConfig(path) {
-    const object = _.merge({}, configDafault, require('require-all')(path));
-    const config = {};
-    _.forEach(object, (value, key) => {
-        Object.defineProperty(config, key, {
-            value,
-            writable: false,
-            enumerable: true
-        })
+  const object = _.merge({}, configDafault, require('require-all')(path));
+  const config = {};
+  _.forEach(object, (value, key) => {
+    Object.defineProperty(config, key, {
+      value,
+      writable: false,
+      enumerable: true
     })
-    return config;
+  })
+  return config;
 }
 /**
  * @method loadMiddlewares
@@ -78,10 +77,10 @@ function buildConfig(path) {
  * @author Antonio Mejias <antoniomejiasv94@gmail.com>
  */
 function loadMiddlewares(cano) {
-    const {middlewares} = cano.app.config;
-    if (middlewares && Array.isArray(middlewares) && middlewares.length > 0) {
-        _.forEach(middlewares, middleware => cano.use(middleware))
-    }
+  const {middlewares} = cano.app.config;
+  if (middlewares && Array.isArray(middlewares) && middlewares.length > 0) {
+    _.forEach(middlewares, middleware => cano.use(middleware));
+  }
 }
 /**
  * @method listenForShutdownEvents
@@ -90,12 +89,12 @@ function loadMiddlewares(cano) {
  * @author Antonio Mejias <antoniomejiasv94@gmail.com>
  */
 function listenForShutdownEvents() {
-    _.reduce(BASIC_SIGNALS, (process, signal) => {
-        process.on(signal, () => {
-            process.exit(0);
-        })
-        return process;
-    }, process)
+  _.reduce(BASIC_SIGNALS, (process, signal) => {
+    process.on(signal, () => {
+      process.exit(0);
+    })
+    return process;
+  }, process);
 }
 
 /**
@@ -107,7 +106,7 @@ function listenForShutdownEvents() {
  * @author Ernesto Rojas <ernesto20145@gmail.com>
  */
 function instantCubes(cano, cubes = []) {
-    return cubes.map(Cube => new Cube(cano));
+  return cubes.map(Cube => new Cube(cano));
 }
 
 /**
@@ -120,10 +119,10 @@ function instantCubes(cano, cubes = []) {
  * @author Antonio Mejias
  */
 function initCubesLifeCycle(cubes) {
-    return new Promise((resolve, reject) => {
-        const promises = _.map(cubes, cube => promisifyCubeLifeCycle(cube))
-        Promise.all(promises).then(resolve).catch(reject)
-    })
+  return new Promise((resolve, reject) => {
+    const promises = _.map(cubes, cube => promisifyCubeLifeCycle(cube))
+    Promise.all(promises).then(resolve).catch(reject)
+  });
 }
 
 /**
@@ -134,28 +133,28 @@ function initCubesLifeCycle(cubes) {
  * @author Antonio Mejias
  */
 function promisifyCubeLifeCycle(cube) {
-    return new Promise((resolve, reject) => {
-        cube
-            .validate()
-            .then(() => cube.prepare())
-            .then(() => cube.up())
-            .then(resolve)
-            .catch(reject)
-    })
+  return new Promise((resolve, reject) => {
+    cube
+      .validate()
+      .then(() => cube.prepare())
+      .then(() => cube.up())
+      .then(resolve)
+      .catch(reject)
+  })
 }
 
 const BASIC_SIGNALS = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
 
 // Object with configuration default.
 const configDafault = {
-    web: {
-        port: process.env.PORT || 20145,
-        env: process.env.NODE_ENV || 'development'
-    },
-    log: {
-        debug: console.log,
-        info: console.info,
-        warn: console.warn,
-        error: console.error
-    }
+  web: {
+    port: process.env.PORT || 20145,
+    env: process.env.NODE_ENV || 'development'
+  },
+  log: {
+    debug: console.log,
+    info: console.info,
+    warn: console.warn,
+    error: console.error
+  }
 };
